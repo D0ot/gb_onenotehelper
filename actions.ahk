@@ -16,7 +16,9 @@ global program_executable := "OneNoteUWP"
 global click_max_interval := 300
 ; Configurations end
 
-
+; Wacom Feel It Constant for GB12
+global PEN_X_MAX := 25272
+global PEN_Y_MAX := 16848
 
 
 

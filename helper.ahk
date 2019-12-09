@@ -24,22 +24,26 @@ PenCallback(input, lastInput) {
     {
         ; assume it is "down"
         ; MsgBox, Pressed
-        Send, {F9}
+        Send, {F13}
     }
 
     if(lastInput = SPEN_BTN_HOVERING and input = SPEN_HOVERING)
     {
         ; assume it is "up"
-        Send, {F10}
+        Send, {F14}
     }
 
     if(lastInput = SPEN_BTN_HOVERING and input = SPEN_BTN_TOUCHING)
     {
         ; assume btn_touching
-        Send, {F11}
+        Send, {F15}
     }
 
 }
+
+global raw_pen_x
+global raw_pen_y
+
 
 ; Include AHKHID
 #include AHKHID.ahk
@@ -75,6 +79,9 @@ InputMsg(wParam, lParam) {
 
         raw := NumGet(uData, 0, "UInt")
         proc := (raw >> 8) & 0x1F
+
+        raw_pen_x := NumGet(uData, 2, "UShort")
+        raw_pen_y := NumGet(uData, 4, "UShort")
 
         LimitPenCallback(proc)
     }
@@ -115,8 +122,11 @@ global program_executable := "OneNoteUWP"
 
 global click_max_interval := 300
 global quick_panel_wait := 300
-
 ; Configurations end
+
+; Wacom Feel It Constant for GB12
+global PEN_X_MAX := 25272
+global PEN_Y_MAX := 16848
 
 
 ; for tool switch
@@ -172,8 +182,9 @@ return
 show_quick_panel()
 {
     CoordMode, Mouse, Screen
-    MouseGetPos, x, y
-    Gui, %gui1Hwnd%:Show, X%x% Y%y%
+    qp_x := raw_pen_x / PEN_X_MAX * 2160
+    qp_y := raw_pen_y / PEN_Y_MAX * 1440
+    Gui, %gui1Hwnd%:Show, X%qp_x% Y%qp_y%
 }
 
 
@@ -268,7 +279,7 @@ button_timer()
 
 
 ; for pen btn down
-F9::
+F13::
 ;MsgBox, F9 get btn_timer_on = %btn_timer_on%
 
 
@@ -291,14 +302,14 @@ else
 return
 
 ; for pen btn up
-F10::
+F14::
 if (btn_timer_on = 1)
 {
     btn_up_count := btn_up_count + 1
 }
 return
 
-F11::
+F15::
 btn_touching := 1
 return
 
@@ -337,12 +348,6 @@ actions(times, long)
 
         if(times = 2)
         {
-        }
-
-        if(times = 3)
-        {
-            win_title := get_win_title_regex(win_title_regex)
-            MsgBox, win_title is %win_title%
         }
 
     }

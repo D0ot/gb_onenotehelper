@@ -103,8 +103,8 @@ InputMsg(wParam, lParam) {
         
 
 
-        ;SB_SetText(raw_x . " | " . raw_y . " | " . raw_pressure . " | " . raw_height )
-        SB_SetText(raw_k1 . " | " . raw_k2 . " | " . raw_k3)
+        SB_SetText(raw_x . " | " . raw_y . " | " . raw_pressure . " | " . raw_height )
+        ;SB_SetText(raw_k1 . " | " . raw_k2 . " | " . raw_k3)
         LimitPenCallback(proc)
     } 
 }
