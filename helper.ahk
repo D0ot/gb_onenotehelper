@@ -151,7 +151,8 @@ global win_title := "Default"
 global gui1Hwnd := 0
 global quick_panel_width := 100
 Gui, New, +AlwaysOnTop -Caption +Hwndgui1Hwnd
-MsgBox, %gui1Hwnd%
+; debug code
+; MsgBox, %gui1Hwnd%
 Gui, %gui1Hwnd%:Add, Text,, Quick Panel
 Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Cancel
 Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Copy
@@ -205,7 +206,7 @@ show_quick_panel()
 
 apply_click(winTitleRegEx, offset_x, offset_y)
 {
-    winTitle := "Not Found"
+    winTitle := 0
     SetTitleMatchMode, RegEx
     WinGetTitle, winTitle, %winTitleRegEx% 
     WinGetPos, x, y, w, h, %winTitle%
@@ -217,7 +218,7 @@ apply_click(winTitleRegEx, offset_x, offset_y)
 
 get_win_title_regex(winTitleRegEx)
 {
-    winTitle := "Not Found"
+    winTitle := 0
     SetTitleMatchMode, RegEx
     WinGetTitle, winTitle, %winTitleRegEx% 
     return winTitle
@@ -340,7 +341,21 @@ actions(times, long)
 
         if(times = 1)
         {
-            switch_tool()
+            ret := get_win_title_regex(win_title_regex)
+
+            if(StrLen(ret) = 0)
+            {
+                launch_program()
+            }else
+            {
+                if(Winactive(win_title_regex))
+                {
+                    switch_tool()
+                } else
+                {
+                    WinActivate, %win_title_regex%
+                }
+            }
         }
 
         if(times = 2)
@@ -371,6 +386,12 @@ actions(times, long)
         }
 
     }
+}
+
+
+launch_program()
+{
+    Run, %program_executable%
 }
 
 
