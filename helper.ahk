@@ -149,15 +149,18 @@ global btn_touching := 0
 global win_title := "Default"
 
 global gui1Hwnd := 0
+global quick_panel_width := 100
 Gui, New, +AlwaysOnTop -Caption +Hwndgui1Hwnd
 MsgBox, %gui1Hwnd%
 Gui, %gui1Hwnd%:Add, Text,, Quick Panel
-Gui, %gui1Hwnd%:Add, Button, Default w100, Copy
-Gui, %gui1Hwnd%:Add, Button, Default w100, Paste
-Gui, %gui1Hwnd%:Add, Button, Default w100, Delete
+Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Cancel
+Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Copy
+Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Paste
+Gui, %gui1Hwnd%:Add, Button, Default w%quick_panel_width%, Delete
 
-F8::
-show_quick_panel()
+
+ButtonCancel:
+Gui, %gui1Hwnd%:Hide
 return
 
 ButtonCopy:
@@ -179,11 +182,23 @@ Sleep, %quick_panel_wait%
 Send, {Delete Down}{Delete Up}
 return
 
+
+get_pen_pos_x()
+{
+    return raw_pen_x / PEN_X_MAX * 2160
+}
+
+get_pen_pos_y()
+{
+
+    return raw_pen_y / PEN_Y_MAX * 1440
+}
+
 show_quick_panel()
 {
     CoordMode, Mouse, Screen
-    qp_x := raw_pen_x / PEN_X_MAX * 2160
-    qp_y := raw_pen_y / PEN_Y_MAX * 1440
+    qp_x := get_pen_pos_x() - (quick_panel_width / 2)
+    qp_y := get_pen_pos_y() - 50
     Gui, %gui1Hwnd%:Show, X%qp_x% Y%qp_y%
 }
 
@@ -343,11 +358,16 @@ actions(times, long)
 
         if(times = 1)
         {
-            Send, #+s
+            px := get_pen_pos_x()
+            py := get_pen_pos_y()
+            CoordMode, Mouse, Screen
+            Click, right, %px%, %py%
+
         }
 
         if(times = 2)
         {
+            Send, #+s
         }
 
     }
