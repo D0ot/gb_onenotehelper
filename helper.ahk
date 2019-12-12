@@ -184,15 +184,36 @@ Send, {Delete Down}{Delete Up}
 return
 
 
+global pen_pos_x_cache
+global pen_pos_y_cache
+
+pen_pos_update()
+{
+    SysGet, pm, MonitorPrimary
+    SysGet, Mon2, Monitor, %pm%
+    pm_width := Mon2Right - Mon2Left
+    pm_height := Mon2Bottom - Mon2Top
+    if(pm_width > pm_height)
+    {
+        pen_pos_x_cache := (raw_pen_x / PEN_X_MAX) * pm_width
+        pen_pos_y_cache := (raw_pen_y / PEN_Y_MAX) * pm_height
+    }else
+    {
+        pen_pos_y_cache := pm_width - (raw_pen_x / PEN_X_MAX) * pm_width
+        pen_pos_x_cache := (raw_pen_y / PEN_Y_MAX) * pm_height
+    }
+}
+
 get_pen_pos_x()
 {
-    return raw_pen_x / PEN_X_MAX * 2160
+    pen_pos_update()
+    return pen_pos_x_cache
 }
 
 get_pen_pos_y()
 {
-
-    return raw_pen_y / PEN_Y_MAX * 1440
+    pen_pos_update()
+    return pen_pos_y_cache
 }
 
 show_quick_panel()
